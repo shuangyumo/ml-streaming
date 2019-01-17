@@ -33,14 +33,18 @@ docker cp src/test/resources/agaricus.model flink:/data/agaricus.model
 dku submit flink ml-streaming --brokers kafka:9092 --in in --out out --model agaricus.model --shape 127
 
 dku kafka kafka-console-producer.sh --broker-list kafka:9092 --topic in
-0 1:1 9:1 19:1 21:1 24:1 34:1 36:1 39:1 42:1 53:1 56:1 65:1 69:1 77:1 86:1 88:1 92:1 95:1 102:1 106:1 117:1 122:1
-1 3:1 9:1 19:1 21:1 30:1 34:1 36:1 40:1 41:1 53:1 58:1 65:1 69:1 77:1 86:1 88:1 92:1 95:1 102:1 106:1 118:1 124:1
+? 1:1 9:1 19:1 21:1 24:1 34:1 36:1 39:1 42:1 53:1 56:1 65:1 69:1 77:1 86:1 88:1 92:1 95:1 102:1 106:1 117:1 122:1
+? 3:1 9:1 19:1 21:1 30:1 34:1 36:1 40:1 41:1 53:1 58:1 65:1 69:1 77:1 86:1 88:1 92:1 95:1 102:1 106:1 118:1 124:1
+? 1:1 9:1 20:1 21:1 24:1 34:1 36:1 39:1 41:1 53:1 56:1 65:1 69:1 77:1 86:1 88:1 92:1 95:1 102:1 106:1 117:1 122:1
 (CTRL-D)
 
 dku kafka  kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic out --from-beginning
 ```
+Expected predictions: 0, 1, 0
 
-** Trainging (not working yet) **
+The Flink UI can be accessed from the NGINX proxy server running on port 80
+
+** Training (not working yet) **
 
 ```sh
 mkdir data && cd data

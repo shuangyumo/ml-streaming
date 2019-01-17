@@ -1,8 +1,7 @@
 // train the model and save it to file
 import ml.dmlc.xgboost4j.scala.{XGBoost, DMatrix}
 
-// val dtrain = new DMatrix("/tmp/agaricus.txt.train")
-val dtrain = new DMatrix("src/test/resources/agaricus.txt.train")
+val dtrain = new DMatrix("data/agaricus.txt.train")
 val params = List(
   "eta" -> 1.0,
   "max_depth" -> 2,
@@ -12,5 +11,5 @@ val booster = XGBoost.train(dtrain, params, 3)
 booster.saveModel("src/test/resources/agaricus.model")
 
 // run the model
-val dtest = new DMatrix("src/test/resources/agaricus.txt.test")
+val dtest = new DMatrix("data/agaricus.txt.test")
 val predicts = booster.predict(dtest)

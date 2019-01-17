@@ -1,9 +1,10 @@
 package fr.braux.test
 
 import java.util.Properties
-
 // warning: this line is mandatory to avoid error message "could not find implicit value for evidence parameter"
 import org.apache.flink.streaming.api.scala._
+import ml.dmlc.xgboost4j.scala.DMatrix
+import ml.dmlc.xgboost4j.java.{DMatrix => JDMatrix}
 import ml.dmlc.xgboost4j.scala.{Booster, XGBoost}
 import org.apache.flink.api.common.functions.RichMapFunction
 import org.apache.flink.api.common.serialization.SimpleStringSchema
@@ -36,10 +37,16 @@ object StreamPredict extends App  {
     val producer = new FlinkKafkaProducer010[String](params.getRequired("brokers"), params.getRequired("out"), new SimpleStringSchema())
     val streamin = env.addSource(consumer)
 
-    // to do: this class is processing message per message and not working on datasets
+    // to be improved: this class is processing message per message and not working on datasets
     class MapPredict(boost: Booster, shape: Int) extends RichMapFunction[String,String] {
         override def map(svmrow: String): String = {
-            boost.predict(Utils.svm2DMatrix(svmrow, shape))(0).map(x => if (x > 0.5) "1" else "0").head
+          // decode a svmlib row and build a CSR sparse matrix with a single row
+          val items = svmrow.split(' ').tail
+          val (indices,values) = items.map{item => (item.split(':')(0).toInt, item.split(':')(1).toFloat)}.unzip
+          val dmat = new DMatrix(List[Long](0, indices.length).toArray, indices, values, JDMatrix.SparseType.CSR, shape)
+          val predict = boost.predict(dmat)
+          // the prediction contains a single row and a single column (value between 0 and 1) which is rounded and prepended to the message
+          (predict(0).map(x => if (x > 0.5) "1" else "0").head +: items).mkString(" ")
         }
     }
 
