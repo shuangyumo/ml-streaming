@@ -1,9 +1,11 @@
 /*
 This class was cloned from https://github.com/dmlc/xgboost/blob/master/jvm-packages/xgboost4j-flink/src/main/scala/ml/dmlc/xgboost4j/scala/flink/XGBoost.scala
 The only difference is use of Scala RabitTracker class instead of the (Python)Java RabitTracker class
- */
 
-package ml.dmlc.xgboost4j.scala.flink
+*/
+
+package ml.dmlc.xgboost4j.scala.flink // RabitTracker is a private class!
+
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
 

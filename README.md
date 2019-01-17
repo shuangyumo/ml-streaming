@@ -6,6 +6,7 @@ A simple ML streaming application on Kafka and Flink: consumes messages from an 
 * Flink: https://ci.apache.org/projects/flink/flink-docs-release-1.6/quickstart/scala_api_quickstart.html
 * Flink samples: https://github.com/apache/flink/tree/master/flink-examples/flink-examples-batch/src/main/scala/org/apache/flink/examples/scala 
 * Kafka Connector: https://ci.apache.org/projects/flink/flink-docs-stable/dev/connectors/kafka.html
+* Data Set: https://rdrr.io/cran/xgboost/man/agaricus.test.html 
 
 ### Build
 The project template was created with ```bash <(curl https://flink.apache.org/q/sbt-quickstart.sh)```
@@ -25,12 +26,12 @@ dku kafka kafka-topics.sh --zookeeper kafka:2181 --create --topic in --partition
 dku kafka kafka-topics.sh --zookeeper kafka:2181 --create --topic out --partitions 1 --replication-factor 1
 ```
 
-Copy the model file to container and submit the predict application (127 is the number of features in the samples)
+Copy the model file to container and submit the predict application 
 Publish some input data in svmlib format on Kafka input topic
 and check the output topic
 ```sh
 docker cp src/test/resources/agaricus.model flink:/data/agaricus.model
-dku submit flink ml-streaming --brokers kafka:9092 --in in --out out --model agaricus.model --shape 127
+dku submit flink ml-streaming --brokers kafka:9092 --in in --out out --model agaricus.model --variables 126
 
 dku kafka kafka-console-producer.sh --broker-list kafka:9092 --topic in
 ? 1:1 9:1 19:1 21:1 24:1 34:1 36:1 39:1 42:1 53:1 56:1 65:1 69:1 77:1 86:1 88:1 92:1 95:1 102:1 106:1 117:1 122:1
@@ -44,7 +45,9 @@ Expected predictions: 0, 1, 0
 
 The Flink UI can be accessed from the NGINX proxy server running on port 80
 
-** Training (not working yet) **
+**Distributed Training**
+
+NOT WORKING
 
 ```sh
 mkdir data && cd data
