@@ -31,7 +31,7 @@ Publish some input data in svmlib format on Kafka input topic
 and check the output topic
 ```sh
 docker cp agaricus.model flink:/data/agaricus.model
-dku submit flink test-scala-kafka --brokers kafka:9092 --in in --out out --model /data/agaricus.model 127
+dku submit flink ml-streaming --brokers kafka:9092 --in in --out out --model /data/agaricus.model 127
 
 dku kafka kafka-console-producer.sh --broker-list kafka:9092 --topic in
 0 1:1 9:1 19:1 21:1 24:1 34:1 36:1 39:1 42:1 53:1 56:1 65:1 69:1 77:1 86:1 88:1 92:1 95:1 102:1 106:1 117:1 122:1
@@ -50,5 +50,6 @@ curl -O https://raw.githubusercontent.com/dmlc/xgboost/master/demo/data/agaricus
 curl -O https://raw.githubusercontent.com/dmlc/xgboost/master/demo/data/agaricus.txt.train
 
 docker cp agaricus.txt.train flink:/data/agaricus.train
-dku submit flink test-scala-kafka -c test.scala.kafka.XGBoostTrain /data/agaricus.train
+dku submit flink ml-streaming -c test.scala.kafka.XGBoostTrain /data/agaricus.train
 ```
+

@@ -1,7 +1,7 @@
 // PROJECT
-name := "test-scala-kafka"
+name := "ml-streaming"
 version := "0.1-SNAPSHOT"
-organization := "test.scala.stream"
+organization := "fr.braux"
 
 // VERSION
 scalaVersion := "2.11.12"
