@@ -45,7 +45,6 @@ dku kafka  kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic out -
 
 ** Trainging (not working yet) **
 
-
 ```sh
 curl -O https://raw.githubusercontent.com/dmlc/xgboost/master/demo/data/agaricus.txt.test
 curl -O https://raw.githubusercontent.com/dmlc/xgboost/master/demo/data/agaricus.txt.train
