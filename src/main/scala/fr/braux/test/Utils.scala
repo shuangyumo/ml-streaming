@@ -1,6 +1,7 @@
 package fr.braux.test
 
 import ml.dmlc.xgboost4j.scala.DMatrix
+import ml.dmlc.xgboost4j.java.{DMatrix => JDMatrix}
 
 object Utils {
 

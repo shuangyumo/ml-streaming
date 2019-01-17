@@ -4,12 +4,11 @@ import ml.dmlc.xgboost4j.scala.flink.XGBoostRabit
 import org.apache.flink.api.scala.ExecutionEnvironment
 import org.apache.flink.ml.MLUtils
 
-object StreamTrain extends App with Logging {
+object StreamTrain extends App  {
   if (args.length != 1) {
     System.err.println("USAGE: XGBoostTrain <FILE>")
     System.exit(1)
   }
-  logger.info("training")
   val env: ExecutionEnvironment = ExecutionEnvironment.getExecutionEnvironment
 
   val trainfile = args(0)

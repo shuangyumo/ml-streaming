@@ -1,6 +1,5 @@
 // predict from a single line and test svmToDMatrix
 
-import fr.braux.test.Utils
 import ml.dmlc.xgboost4j.scala.{DMatrix, XGBoost}
 import ml.dmlc.xgboost4j.java.{DMatrix => JDMatrix}
 
