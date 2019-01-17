@@ -36,15 +36,14 @@ object StreamPredict extends App  {
     val producer = new FlinkKafkaProducer010[String](params.getRequired("brokers"), params.getRequired("out"), new SimpleStringSchema())
     val streamin = env.addSource(consumer)
 
+    // to do: this class is processing message per message and not working on datasets
     class MapPredict(boost: Booster, shape: Int) extends RichMapFunction[String,String] {
         override def map(svmrow: String): String = {
-            boost.predict(Utils.svm2DMatrix(svmrow, shape)).mkString
+            boost.predict(Utils.svm2DMatrix(svmrow, shape))(0).map(x => if (x > 0.5) "1" else "0").head
         }
     }
 
-    // this line with hard-coded params is working
-    val streamout = streamin.map(x => XGBoost.loadModel("/data/agaricus.model").predict(Utils.svm2DMatrix(x, 127))(0).mkString)
-    // val streamout = streamin.map(new MapPredict(booster, features))
+    val streamout = streamin.map(new MapPredict(booster, shape))
     streamout.addSink(producer)
-    env.execute("StreamPredict on " + model)
+    env.execute("StreamPredict using " + model)
 }

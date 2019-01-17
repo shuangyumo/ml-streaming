@@ -10,9 +10,7 @@ A simple ML streaming application on Kafka and Flink: consumes messages from an 
 ### Build
 The project template was created with ```bash <(curl https://flink.apache.org/q/sbt-quickstart.sh)```
 
-An assembly JAR is built and sftp'ed to a testing server (see publish section of ```built.sbt```)
-
-In sbt shell run: ```publish ```
+An assembly JAR is built and sftp'ed to a testing server. Just run in sbt shell: ```publish ```
 
 ### Testing
 
@@ -45,10 +43,11 @@ dku kafka  kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic out -
 ** Trainging (not working yet) **
 
 ```sh
+mkdir data && cd data
 curl -O https://raw.githubusercontent.com/dmlc/xgboost/master/demo/data/agaricus.txt.test
 curl -O https://raw.githubusercontent.com/dmlc/xgboost/master/demo/data/agaricus.txt.train
 
 docker cp agaricus.txt.train flink:/data/agaricus.train
-dku submit flink ml-streaming -c test.scala.kafka.XGBoostTrain /data/agaricus.train
+dku submit flink ml-streaming -c XGBoostTrain /data/agaricus.train
 ```
 
