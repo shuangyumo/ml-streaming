@@ -1,6 +1,12 @@
 package fr.braux.test
 
 import java.util.Properties
+
+import org.apache.flink.streaming.api.TimeCharacteristic
+import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks
+import org.apache.flink.streaming.api.functions.timestamps.{AscendingTimestampExtractor, BoundedOutOfOrdernessTimestampExtractor}
+import org.apache.kafka.clients.consumer.ConsumerRecord
+
 import scala.util.Random
 // warning: this line is mandatory to avoid error message "could not find implicit value for evidence parameter"
 import org.apache.flink.streaming.api.scala._
@@ -15,6 +21,7 @@ import org.apache.flink.streaming.api.scala.function.RichAllWindowFunction
 import org.apache.flink.streaming.api.windowing.assigners.EventTimeSessionWindows
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
+import org.apache.flink.streaming.api.watermark.Watermark
 
 import ml.dmlc.xgboost4j.scala.DMatrix
 import ml.dmlc.xgboost4j.java.{DMatrix => JDMatrix}
@@ -30,21 +37,27 @@ object StreamPredict extends App  {
 
     val params: ParameterTool = ParameterTool.fromArgs(args)
     val env = StreamExecutionEnvironment.getExecutionEnvironment
+    // Event time processing (using implicit Kafka timestamp)
+    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val properties = new Properties()
     properties.setProperty("bootstrap.servers", params.getRequired("brokers"))
     properties.setProperty("group.id", Random.alphanumeric.filter(_.isLetter).take(20).mkString)
     properties.setProperty("auto.offset.reset", "earliest")
+    // Partition discovery
+    properties.setProperty("flink.partition-discovery.interval-millis","1000")
 
     val model = params.getRequired("model")
     val booster = XGBoost.loadModel("/data/" + model)
     val variables = params.getInt("variables",100)
 
     val consumer = new FlinkKafkaConsumer010[String](params.getRequired("in"), new SimpleStringSchema(), properties)
+    // consumer.assignTimestampsAndWatermarks(new AscendingTimestampExtractor[elt] { def extractAscendingTimestamp(element: String): Long = elt =})
+
     val producer = new FlinkKafkaProducer010[String](params.getRequired("brokers"), params.getRequired("out"), new SimpleStringSchema())
     val streamin = env.addSource(consumer)
 
-    // to be improved: this class is processing message per message and not working on windows
+    // per message processing (not optimal solution but working)
     class MapPredict(boost: Booster, numvar: Int) extends RichMapFunction[String,String] {
         override def map(svmrow: String): String = {
           // decode a svmlib row and build a CSR sparse matrix with a single row
@@ -58,7 +71,7 @@ object StreamPredict extends App  {
     }
     // val streamout = streamin.map(new MapPredict(booster, variables))
 
-    // windows processing
+    // windows processing (NOT WORKING)
     class WindowPredictFunction (boost: Booster) extends ProcessAllWindowFunction[String, String, TimeWindow] {
       override def process(context: Context, input: Iterable[String], out: Collector[String])  = {
         val mapper = (svmrow: String) => {
@@ -72,7 +85,16 @@ object StreamPredict extends App  {
       }
     }
 
-    val streamout = streamin.windowAll(EventTimeSessionWindows.withGap(Time.minutes(2))).process(new WindowPredictFunction(booster))
+  // windows processing (test NOT WORKING pb with timestamps)
+  class TestWindowFunction extends ProcessAllWindowFunction[String, String, TimeWindow] {
+    override def process(context: Context, input: Iterable[String], out: Collector[String])  = {
+      var cnt = 0
+      for (x <- input) if (x.contains("118:")) cnt = cnt + 1
+      out.collect(cnt.toString)
+    }
+  }
+
+    val streamout = streamin.windowAll(EventTimeSessionWindows.withGap(Time.seconds(1))).process(new TestWindowFunction())
     streamout.addSink(producer)
-    env.execute("StreamPredict using " + model)
+    env.execute("StreamPredict(" + model + ")")
 }
