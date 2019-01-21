@@ -12,7 +12,8 @@ val xgboostVersion = "0.81"
 libraryDependencies += "org.apache.flink" %% "flink-scala" % flinkVersion % "provided"
 libraryDependencies += "org.apache.flink" %% "flink-ml" % flinkVersion % "provided"
 libraryDependencies += "org.apache.flink" %% "flink-streaming-scala" % flinkVersion % "provided"
-libraryDependencies += "org.apache.flink" %% "flink-connector-kafka-0.11" % flinkVersion
+libraryDependencies += "org.apache.flink" %% "flink-connector-kafka" % flinkVersion
+
 
 // XGboost dependencies
 // for snapshots add : resolvers += "GitHub Repo" at "https://raw.githubusercontent.com/CodingCat/xgboost/maven-repo/")

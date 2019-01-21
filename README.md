@@ -39,7 +39,7 @@ dku kafka kafka-console-producer.sh --broker-list kafka:9092 --topic in
 ? 1:1 9:1 20:1 21:1 24:1 34:1 36:1 39:1 41:1 53:1 56:1 65:1 69:1 77:1 86:1 88:1 92:1 95:1 102:1 106:1 117:1 122:1
 (CTRL-D)
 
-dku kafka  kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic out --from-beginning
+dku kafka  kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic out --property print.timestamp=true --from-beginning
 ```
 Expected predictions: 0, 1, 0
 
