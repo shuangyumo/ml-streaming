@@ -5,6 +5,7 @@ A simple ML streaming application on Kafka and Flink: consumes messages from an 
 ### Useful links
 * Flink: https://ci.apache.org/projects/flink/flink-docs-release-1.6/quickstart/scala_api_quickstart.html
 * Flink samples: https://github.com/apache/flink/tree/master/flink-examples/flink-examples-batch/src/main/scala/org/apache/flink/examples/scala 
+* Flink windowing: https://flink.apache.org/news/2015/12/04/Introducing-windows.html
 * Kafka Connector: https://ci.apache.org/projects/flink/flink-docs-stable/dev/connectors/kafka.html
 * Data Set: https://rdrr.io/cran/xgboost/man/agaricus.test.html 
 
@@ -23,6 +24,7 @@ dku nginx
 dku flink
 dku kafka
 dku kafka kafka-topics.sh --zookeeper kafka:2181 --create --topic in --partitions 1 --replication-factor 1
+
 dku kafka kafka-topics.sh --zookeeper kafka:2181 --create --topic out --partitions 1 --replication-factor 1
 ```
 
@@ -38,8 +40,10 @@ dku kafka kafka-console-producer.sh --broker-list kafka:9092 --topic in
 ? 3:1 9:1 19:1 21:1 30:1 34:1 36:1 40:1 41:1 53:1 58:1 65:1 69:1 77:1 86:1 88:1 92:1 95:1 102:1 106:1 118:1 124:1
 ? 1:1 9:1 20:1 21:1 24:1 34:1 36:1 39:1 41:1 53:1 56:1 65:1 69:1 77:1 86:1 88:1 92:1 95:1 102:1 106:1 117:1 122:1
 (CTRL-D)
+# check that messages were posted
+dku kafka  kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic in --property print.timestamp=true --from-beginning
 
-dku kafka  kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic out --property print.timestamp=true --from-beginning
+dku kafka  kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic out --from-beginning
 ```
 Expected predictions: 0, 1, 0
 
